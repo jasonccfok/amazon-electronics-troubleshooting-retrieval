@@ -1,0 +1,6 @@
+# Ignore large raw data files
+data/raw/Electronics.jsonl.gz
+data/raw/meta_Electronics.jsonl.gz
+
+# Ignore entire virtual environment folder
+venv_cs410/
