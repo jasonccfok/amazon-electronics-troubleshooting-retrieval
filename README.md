@@ -10,7 +10,7 @@ The Amazon Electronics Troubleshooting Retrieval System is designed to help user
 
 
 ## Project Structure
-
+```
 project_root/
 ├── preprocessing/
 │   ├── load_raw_data.py         # Loads and merges Amazon reviews & product metadata
@@ -39,3 +39,4 @@ project_root/
 │
 ├── README.md
 └── requirements.txt
+```
