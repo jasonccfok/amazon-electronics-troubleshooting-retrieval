@@ -7,12 +7,15 @@ Usage (Windows command prompt example):
 > python "3. evaluation\\retrieval_evaluation.py" ^
     --data "data\\processed\\reviews_clean.csv" ^
     --gold "data\\groundtruth\\gold_set.csv" ^
-    --topk 5
+    --topk 5 ^
+    --embeddings "data\\processed\\review_embeddings.pkl"
 """
 
 import argparse
 import pandas as pd
 import numpy as np
+import os
+import pickle
 from tqdm import tqdm
 from sklearn.metrics import average_precision_score
 from sklearn.metrics.pairwise import cosine_similarity
@@ -76,9 +79,29 @@ class TFIDFRetriever:
 
 
 class SemanticRetriever:
-    def __init__(self, corpus, model_name="all-MiniLM-L6-v2"):
+    def __init__(self, corpus, embed_path, model_name="all-MiniLM-L6-v2"):
+        """
+        Load pre-computed embeddings if available; otherwise compute and save cache.
+        """
+        self.embed_path = embed_path
+        os.makedirs(os.path.dirname(embed_path), exist_ok=True)
+
         self.model = SentenceTransformer(model_name)
-        self.corpus_embeddings = self.model.encode(corpus, show_progress_bar=True, convert_to_tensor=True)
+
+        if os.path.exists(embed_path):
+            print(f"[INFO] Loading cached embeddings from {embed_path}")
+            with open(embed_path, "rb") as f:
+                self.corpus_embeddings = pickle.load(f)
+        else:
+            print("[INFO] Cached embeddings not found. Computing and caching now...")
+            self.corpus_embeddings = self.model.encode(
+                corpus,
+                show_progress_bar=True,
+                convert_to_tensor=True,
+            )
+            with open(embed_path, "wb") as f:
+                pickle.dump(self.corpus_embeddings, f)
+            print(f"[INFO] Embeddings saved to {embed_path}")
 
     def score(self, query):
         q_embed = self.model.encode(query, convert_to_tensor=True)
@@ -89,30 +112,28 @@ class SemanticRetriever:
 # -------------------------------------------------------------------
 # Core Evaluation Workflow
 # -------------------------------------------------------------------
-def evaluate_models(data_path, gold_path, top_k=5):
+def evaluate_models(data_path, gold_path, top_k=5, embed_path=None):
     print(f"[INFO] Loading cleaned data from {data_path}")
     df = pd.read_csv(data_path)
     df.fillna("", inplace=True)
 
-    print(f"[INFO] Loading gold relevance set: {gold_path}")
+    print(f"[INFO] Loading gold relevance set from {gold_path}")
     gold = pd.read_csv(gold_path)
 
-    # Build retrievers
-    bm25 = BM25Retriever(df["clean_text"].tolist())
-    tfidf = TFIDFRetriever(df["clean_text"].tolist())
-    semantic = SemanticRetriever(df["clean_text"].tolist())
+    corpus = df["clean_text"].tolist()
 
-    # Prepare result table
+    # Initialize retrievers
+    bm25 = BM25Retriever(corpus)
+    tfidf = TFIDFRetriever(corpus)
+    semantic = SemanticRetriever(corpus, embed_path)
+
     results = []
 
     for q_text in tqdm(gold["query"].unique(), desc="[Evaluating queries]"):
         subset = gold[gold["query"] == q_text]
         asin_to_rel = dict(zip(subset["parent_asin"], subset["relevance"]))
-
-        # Build ground truth & prediction alignment
         y_true = np.array([asin_to_rel.get(a, 0) for a in df["parent_asin"]])
 
-        # Get model scores
         bm25_scores = bm25.score(q_text)
         tfidf_scores = tfidf.score(q_text)
         sem_scores = semantic.score(q_text)
@@ -131,10 +152,13 @@ def evaluate_models(data_path, gold_path, top_k=5):
         })
 
     res_df = pd.DataFrame(results)
-    res_df.to_csv("data\\groundtruth\\retrieval_evaluation_results.csv", index=False)
+    os.makedirs("data/groundtruth", exist_ok=True)
+    out_path = "data/groundtruth/retrieval_evaluation_results.csv"
+    res_df.to_csv(out_path, index=False)
+
     print("\n=== SUMMARY RESULTS (avg across queries) ===")
     print(res_df.mean(numeric_only=True))
-    print("\nDetailed results saved → data\\groundtruth\\retrieval_evaluation_results.csv")
+    print(f"\nDetailed results saved → {out_path}")
 
 
 # -------------------------------------------------------------------
@@ -145,9 +169,12 @@ def main():
     parser.add_argument("--data", required=True, help="Path to cleaned review CSV")
     parser.add_argument("--gold", required=True, help="Path to gold relevance CSV")
     parser.add_argument("--topk", type=int, default=5, help="Top-k cutoff for metrics")
+    parser.add_argument("--embeddings",
+                        default="data/processed/review_embeddings.pkl",
+                        help="Path to cached embeddings file")
     args = parser.parse_args()
 
-    evaluate_models(args.data, args.gold, args.topk)
+    evaluate_models(args.data, args.gold, args.topk, args.embeddings)
 
 
 if __name__ == "__main__":

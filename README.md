@@ -22,7 +22,8 @@ project_root/
 │   └── semantic_retrieval.py            # Semantic retrieval using transformer-based embeddings
 │
 ├── evaluation/
-│   └── retrieval_evaluation.py          # Evaluates retrieval performance (Precision@K, Recall@K, etc.)
+│   ├── retrieval_evaluation.py          # Evaluates retrieval performance (Precision@K, Recall@K, etc.)
+│   └── evaluation_plot.ipynb            # Visualization of evaluation results
 │
 ├── data/
 │   ├── raw/
