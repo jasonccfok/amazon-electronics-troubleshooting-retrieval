@@ -47,15 +47,17 @@ project_root/
 ### BM25 Lexical Retrieval
 
 cmd
+```
 python "2. retrieval\bm25_retrieval.py" ^
     --data "data\processed\reviews_clean.csv" ^
     --query "tripod screw loose problem" ^
     --topk 5
-
+```
 
 Output Example:
 
 ================= QUERY RESULTS =================
+
 Query: tripod screw loose problem
 
 ------ BM25 Top Results ------
@@ -70,16 +72,18 @@ Query: tripod screw loose problem
 ### Semantic Retrieval (Transformer-based)
 
 cmd
+```
 python "2. retrieval\semantic_retrieval.py" ^
     --data "data\processed\reviews_clean.csv" ^
     --query "phone adapter screw problem" ^
     --topk 5 ^
     --model "all-MiniLM-L6-v2"
-
+```
 
 Output Example:
 
 ================= QUERY RESULTS =================
+
 Query: phone adapter screw problem
 
 ------ Semantic (SentenceTransformer) Top Results ------
