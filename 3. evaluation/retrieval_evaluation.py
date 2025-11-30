@@ -131,10 +131,10 @@ def evaluate_models(data_path, gold_path, top_k=5):
         })
 
     res_df = pd.DataFrame(results)
-    res_df.to_csv("data\\processed\\retrieval_evaluation_results.csv", index=False)
+    res_df.to_csv("data\\groundtruth\\retrieval_evaluation_results.csv", index=False)
     print("\n=== SUMMARY RESULTS (avg across queries) ===")
     print(res_df.mean(numeric_only=True))
-    print("\nDetailed results saved → data\\processed\\retrieval_evaluation_results.csv")
+    print("\nDetailed results saved → data\\groundtruth\\retrieval_evaluation_results.csv")
 
 
 # -------------------------------------------------------------------
