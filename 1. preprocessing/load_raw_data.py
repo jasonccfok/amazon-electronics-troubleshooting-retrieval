@@ -9,7 +9,7 @@ This script:
 3. Combines product title, review title, and review text
 4. Saves a sample (or full dataset) CSV for text preprocessing
 
-Usage (Windows example):
+Usage (Windows command prompt example):
 > python "1. preprocessing\\load_raw_data.py" ^
     --review "data\\raw\\Electronics.jsonl.gz" ^
     --meta "data\\raw\\meta_Electronics.jsonl.gz" ^
@@ -78,6 +78,9 @@ def build_merged_dataset(review_path: str, meta_path: str, output_path: str, lim
     print(f"[INFO] Total records: {len(merged_df_out)}")
 
 
+# -------------------------------------------------------------------
+# Entry Point
+# -------------------------------------------------------------------
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load & merge raw Amazon Electronics review data.")
     parser.add_argument("--review", required=True, help="Path to Electronics.jsonl.gz")

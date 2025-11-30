@@ -1,16 +1,11 @@
 """
-bm25_retrieval.py  (Revision: show full raw text)
+bm25_retrieval.py
 
 Traditional keyword retrieval baseline using:
-  - BM25 (Okapi-based lexical scoring)
-  - TF-IDF (cosine similarity baseline)
+  - BM25
+  - TF-IDF
 
-Dataset must have:
-  - parent_asin
-  - clean_text  (used for indexing)
-  - review_text (raw/original review text for display)
-
-Usage (from project root):
+Usage (Windows command prompt example):
 > python "2. retrieval\\bm25_retrieval.py" ^
     --data "data\\processed\\reviews_clean.csv" ^
     --query "tripod screw loose problem" ^
@@ -34,22 +29,23 @@ nltk.download("punkt", quiet=True)
 # Load Dataset
 # -------------------------------------------------------------------
 def load_reviews(path: str) -> pd.DataFrame:
+    """
+    Load cleaned reviews dataset that contains required columns:
+      • clean_text  → preprocessed text for embedding
+      • review_text → raw/original review text (for display)
+    """
     print(f"[INFO] Loading cleaned data from {path}")
     df = pd.read_csv(path)
 
-    # Try to find a column for the raw/original text
-    possible_raw_cols = [c for c in df.columns if c.lower() in ["review_text", "reviewbody", "text", "raw_text"]]
-    if not possible_raw_cols:
-        raise ValueError(
-            "[ERROR] Dataset must include a column with the original raw text "
-            "(e.g. 'review_text' or 'reviewBody')"
-        )
-    raw_col = possible_raw_cols[0]
+    required_cols = ["clean_text", "review_text"]
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"[ERROR] Missing required column '{col}' in dataset.")
 
-    df = df.dropna(subset=["clean_text", raw_col])
-    df.rename(columns={raw_col: "review_text"}, inplace=True)
+    # Drop rows missing either clean_text or review_text
+    df = df.dropna(subset=required_cols)
 
-    print(f"[INFO] Records loaded: {len(df)} with raw text column '{raw_col}'")
+    print(f"[INFO] Records loaded: {len(df)} (columns: clean_text, review_text)")
     return df
 
 

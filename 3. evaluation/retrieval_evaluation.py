@@ -3,23 +3,10 @@ retrieval_evaluation.py
 ------------------------------------
 Evaluates keyword (BM25, TF-IDF) and semantic retrieval methods.
 
-Expected Inputs:
-  - Cleaned review data:  data\processed\reviews_clean.csv
-  - (Optional) gold_set.csv:  manual relevance table
-
-If a "gold_set.csv" is not available, this script can accept
-manual queries to inspect qualitative differences.
-
-Gold set format (CSV):
-  query, parent_asin, relevance
-  "phone adapter screw problem", B013ZJMR3K, 1
-  "phone adapter screw problem", B0126KXDN2, 0
-  ...
-
-Usage (from project root):
+Usage (Windows command prompt example):
 > python "3. evaluation\\retrieval_evaluation.py" ^
     --data "data\\processed\\reviews_clean.csv" ^
-    --gold "data\\processed\\gold_set.csv" ^
+    --gold "data\\groundtruth\\gold_set.csv" ^
     --topk 5
 """
 

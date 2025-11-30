@@ -3,13 +3,11 @@ semantic_retrieval.py
 ---------------------
 Retrieves top documents semantically related to a user query.
 
-Features:
-  • Uses SentenceTransformer (MiniLM, etc.)
-  • Auto-selects GPU if available (CUDA)
-  • Caches computed document embeddings to avoid re-encoding
-  • Prints retrieval results like bm25_retrieval.py (full raw reviews)
+This script:
+  - Uses SentenceTransformer (MiniLM)
+  - Caches computed document embeddings to avoid re-encoding
 
-Usage (Windows example):
+Usage (Windows command prompt example):
 > python "2. retrieval\\semantic_retrieval.py" ^
     --data "data\\processed\\reviews_clean.csv" ^
     --query "phone adapter screw problem" ^
@@ -88,9 +86,7 @@ def semantic_retrieve(data_path: str, query: str, topk: int, model_name: str = "
     # Sort & Select top-k
     df_sorted = df.sort_values("score", ascending=False).head(topk).reset_index(drop=True)
 
-    # -------------------------------------------------------------------
-    # Print results in BM25-style format (full raw text, no truncation)
-    # -------------------------------------------------------------------
+    # Print results
     print("\n================= QUERY RESULTS =================")
     print(f"Query: {query}")
     print("------ Semantic (SentenceTransformer) Top Results ------")

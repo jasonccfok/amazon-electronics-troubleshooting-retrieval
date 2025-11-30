@@ -1,20 +1,17 @@
 """
 text_cleaning.py
-----------------
+
 Cleans and normalizes combined review texts produced by load_raw_data.py,
 and saves BOTH raw and cleaned versions.
 
-Processing Steps:
+This script:
  1. Load merged CSV (parent_asin, combined_text)
  2. Normalize text (lowercase, remove URLs/punctuation/extra spaces)
  3. Optionally remove stopwords
- 4. Lemmatize words (verb-biased)
- 5. Save both raw and cleaned text to data\\processed\\reviews_clean.csv
+ 4. Lemmatize words
+ 5. Save both raw and cleaned text to reviews_clean.csv
 
-Output columns:
-    parent_asin, review_text, clean_text
-
-Usage (Windows example):
+Usage (Windows command prompt example):
 > python "1. preprocessing\\text_cleaning.py" ^
     --input "data\\processed\\electronics_merged.csv" ^
     --output "data\\processed\\reviews_clean.csv"
@@ -100,26 +97,15 @@ def preprocess_reviews(input_path: str, output_path: str, remove_stops: bool = T
     print(f"[INFO] Total records: {len(df_out)}")
     print(f"[INFO] Sample:\n{df_out.head(2)}")
 
+
 # -------------------------------------------------------------------
 # Entry Point
 # -------------------------------------------------------------------
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Clean and normalize Amazon review text (retain raw + clean).")
-    parser.add_argument(
-        "--input",
-        required=True,
-        help="Path to merged CSV (e.g., data\\processed\\electronics_merged.csv)",
-    )
-    parser.add_argument(
-        "--output",
-        required=True,
-        help="Output CSV path for cleaned text (e.g., data\\processed\\reviews_clean.csv)",
-    )
-    parser.add_argument(
-        "--no-stopwords",
-        action="store_true",
-        help="Skip stopword removal if specified.",
-    )
-
+    parser.add_argument("--input", required=True, help="Path to merged CSV (e.g., data\\processed\\electronics_merged.csv)")
+    parser.add_argument("--output", required=True, help="Output CSV path for cleaned text (e.g., data\\processed\\reviews_clean.csv)")
+    parser.add_argument("--no-stopwords", action="store_true", help="Skip stopword removal if specified.")
     args = parser.parse_args()
+
     preprocess_reviews(args.input, args.output, remove_stops=not args.no_stopwords)
