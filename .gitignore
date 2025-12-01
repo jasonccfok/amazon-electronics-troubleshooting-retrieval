@@ -4,3 +4,6 @@ data/raw/meta_Electronics.jsonl.gz
 
 # Ignore entire virtual environment folder
 venv_cs410/
+
+# Ignore .docx documentation
+documentation.docx
